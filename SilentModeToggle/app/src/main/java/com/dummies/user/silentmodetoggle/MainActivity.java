@@ -1,13 +1,15 @@
 package com.dummies.user.silentmodetoggle;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.widget.Button;
-
-
 import android.widget.ImageView;
 
 public class MainActivity extends Activity {
@@ -53,7 +55,19 @@ public class MainActivity extends Activity {
             }
         });
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void checkAccess() {
+        NotificationManager n = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        if(!n.isNotificationPolicyAccessGranted()) {
+           // Ask the user to grant access
+            Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+            startActivityForResult(intent, 0);
+        }
+    }
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void onButtonClick() {
+        checkAccess();
         if(mPhoneIsSilent) {
             //переключение в режим громкого звонка
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
