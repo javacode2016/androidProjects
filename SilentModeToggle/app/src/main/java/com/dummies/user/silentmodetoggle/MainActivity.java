@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
 
     Button toggleButton;
     private AudioManager mAudioManager;
-    private Boolean mPhoneIsSilent = false;
+    private Boolean mPhoneIsSilent;
     ImageView newPhoneImage;
 
     @Override
@@ -30,13 +30,19 @@ public class MainActivity extends Activity {
             Аргумент R.layout.main ссылается на файл activity_main.xml, расположенный в папке
             res/layouts и определяющий компоновку пользовательского интерфейса
             */
-
-
-
+        newPhoneImage = findViewById(R.id.phone_icon);
         //доступ к звонку помощью базового класса AudioManager
         // который отвечает за управление состояниями звонка
         mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        checkIfPhoneIsSilent();
+
+         /* проверка состояния телефона */
+        int ringerMode = mAudioManager.getRingerMode();
+        if(ringerMode == AudioManager.RINGER_MODE_SILENT) {
+            mPhoneIsSilent = true;
+        }
+        else {
+            mPhoneIsSilent = false;
+        }
 
         //ПРИЕМНИК ЩЕЛЧКА
         toggleButton = findViewById(R.id.toggleButton);
@@ -54,46 +60,31 @@ public class MainActivity extends Activity {
         });
     }
     private void onButtonClick() {
+
         if(mPhoneIsSilent) {
             //переключение в режим громкого звонка
-            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            newPhoneImage.setBackgroundResource(R.drawable.phone_on);
+            //mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            //toggleButton.setText("Активный режим");
             mPhoneIsSilent = false;
         }
         else {
             //переключение в бесшумный режим
-            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            newPhoneImage.setBackgroundResource(R.drawable.phone_silent);
+            //mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            //toggleButton.setText("Бесшумный режим");
             mPhoneIsSilent = true;
         }
-        //переключение пользовательского интерфейса
-        toggleUi();
-    }
-    /* проверка состояния телефона */
-    private void checkIfPhoneIsSilent() {
-        int ringerMode = mAudioManager.getRingerMode();
-        if(ringerMode == AudioManager.RINGER_MODE_SILENT) {
-            mPhoneIsSilent = true;
-        }
-        else {
-            mPhoneIsSilent = false;
-        }
+
     }
 
-    /*переключение рисунка */
-    private void toggleUi() {
-        newPhoneImage = findViewById(R.id.phone_icon);
-        if(mPhoneIsSilent) {
-            newPhoneImage.setBackgroundResource(R.drawable.phone_silent);
-        }
-        else {
-            newPhoneImage.setBackgroundResource(R.drawable.phone_on);
-        }
-    }
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkIfPhoneIsSilent();
-        toggleUi();
+
     }
 
 }
