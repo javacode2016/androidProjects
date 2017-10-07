@@ -50,6 +50,7 @@ public class MainActivity extends Activity {
 
     private void setButtonClickListener(Button button) {
         button.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             public void onClick(View v) {
                 onButtonClick();
             }
