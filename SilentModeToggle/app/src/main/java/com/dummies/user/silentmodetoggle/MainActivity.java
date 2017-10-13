@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -43,20 +44,26 @@ public class MainActivity extends Activity {
         //ПРИЕМНИК ЩЕЛЧКА
         toggleButton = findViewById(R.id.toggleButton);
         setButtonClickListener(toggleButton);
+
+        Log.v("SilentModeApp", "Это моя запись");
     }
 
 
 
-
+    //функция приема щелчка
     private void setButtonClickListener(Button button) {
         button.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             public void onClick(View v) {
-                onButtonClick();
+                ringerSwitchMode();
             }
         });
     }
-
+    /** проверка состояния телефона */
+    private void checkIfPhoneIsSilent() {
+        mPhoneIsSilent = mAudioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT;
+    }
+    /** проверка и запрос доступа к системным функциям*/
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkAccess() {
         NotificationManager n = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -66,28 +73,19 @@ public class MainActivity extends Activity {
             startActivityForResult(intent, 0);
         }
     }
+    /**переключение режимов звонка */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void onButtonClick() {
+    private void ringerSwitchMode() {
         checkAccess();
         if(mPhoneIsSilent) {
-            //переключение в режим громкого звонка
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
             mPhoneIsSilent = false;
-
         }
         else {
-            //переключение в бесшумный режим
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             mPhoneIsSilent = true;
-
         }
-        //переключение пользовательского интерфейса
         toggleUi();
-    }
-    /** проверка состояния телефона */
-    private void checkIfPhoneIsSilent() {
-        int ringerMode = mAudioManager.getRingerMode();
-        mPhoneIsSilent = ringerMode == AudioManager.RINGER_MODE_SILENT;
     }
 
     /** переключение рисунка */
@@ -95,11 +93,11 @@ public class MainActivity extends Activity {
         ImageView newPhoneImage = findViewById(R.id.phone_icon);
         if(mPhoneIsSilent) {
             newPhoneImage.setImageResource(R.drawable.phone_silent);
-            toggleButton.setText(" Тихий ");
+            //toggleButton.setText("Тихий");
         }
         else {
             newPhoneImage.setImageResource(R.drawable.phone_on);
-            toggleButton.setText(" Активный ");
+            //toggleButton.setText("Громкий");
         }
     }
 
